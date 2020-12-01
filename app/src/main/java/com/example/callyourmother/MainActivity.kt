@@ -1,6 +1,8 @@
 package com.example.callmotherapplicationtest
 
 import android.app.ListActivity
+import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -10,7 +12,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ListView
-
+import java.io.*
+import java.sql.Time
+import java.text.ParseException
+import java.util.*
 
 
 class MainActivity : ListActivity() {
@@ -51,11 +56,76 @@ class MainActivity : ListActivity() {
 
     }
 
-    private fun loadItems(){
-        //TODO - Implement similar to lab 4's load items to retrieve the list information
+
+
+    private fun loadItems() {
+        var reader: BufferedReader? = null
+        try {
+            val fis = openFileInput(FILE_NAME)
+            reader = BufferedReader(InputStreamReader(fis))
+
+            var name: String? = null
+            var phoneNumber: String? = null
+            var frequencey: String? = null
+            var timeToRemind: Date? = null
+
+            do {
+                name = reader.readLine();
+                if (title == null)
+                    break
+                //image = reader.readLine()
+                phoneNumber = reader.readLine()
+                frequencey = reader.readLine()
+                timeToRemind = ContactDetails.FORMAT.parse(reader.readLine())
+                mAdapter.add(ContactDetails(name, phoneNumber, timeToRemind,frequencey))
+
+            }
+            while (true)
+
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        } finally {
+            if (null != reader) {
+                try {
+                    reader.close()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+
+            }
+        }
     }
+
     private fun saveItems(){
-        //TODO - Implement similar to lab 4's load items to store the list information
+        var writer: PrintWriter? = null
+        try {
+            val fos = openFileOutput(FILE_NAME, Context.MODE_PRIVATE)
+            writer = PrintWriter(
+                BufferedWriter(
+                    OutputStreamWriter(
+                fos)
+                )
+            )
+
+            for (idx in 0 until mAdapter.count) {
+
+                writer.println(mAdapter.getItem(idx))
+
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } finally {
+            writer?.close()
+        }
+    }
+
+    companion object {
+
+        private val FILE_NAME = "TodoManagerActivityData.txt"
     }
 
 }

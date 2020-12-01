@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/contactItemLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -27,7 +28,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/contactImage"
         app:layout_constraintStart_toEndOf="@+id/contactName"
         app:layout_constraintTop_toTopOf="parent" />
-
+<!--
     <ImageView
         android:id="@+id/contactImage"
         android:layout_width="54dp"
@@ -37,7 +38,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
-
+-->
     <TextView
         android:id="@+id/contactName"
         android:layout_width="wrap_content"

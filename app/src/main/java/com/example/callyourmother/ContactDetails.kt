@@ -2,28 +2,50 @@ package com.example.callmotherapplicationtest
 
 import android.content.Intent
 import android.graphics.Bitmap
+
 import java.sql.Time
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ContactDetails {
     var name : String? = null
-    var image: Bitmap? = null
+   // var image: Bitmap? = null
     var phoneNumber : String? = null
-    var timeToRemind : Time? = null
+    var frequency :Int? = null
+    var timeToRemind = Date()
     var isLate : Boolean = false
 
-    constructor(intent: Intent){
+    internal constructor(name: String, phoneNumber: String, timeToRemind: Date, frequency : String){
+
+        this.name = name
+        this.phoneNumber = phoneNumber
+        this.timeToRemind = timeToRemind
+        this.frequency = frequency.toInt()
+
+        var currentTime = Calendar.getInstance().getTime()
+        isLate = currentTime.after(timeToRemind)
+
+
+    }
+
+    internal constructor(intent: Intent){
         name = intent.getStringExtra(NAME)
-        image = intent.getParcelableExtra(IMAGE)
+       // image = intent.getParcelableExtra(IMAGE)
         phoneNumber = intent.getStringExtra(PHONENUMBER)
         //pass in the time as a toString first
-        timeToRemind = Time.valueOf(intent.getStringExtra(TIMETOREMIND))
+        try {
+            timeToRemind = FORMAT.parse(intent.getStringExtra(TIMETOREMIND))
+        } catch (e: ParseException) {
+            timeToRemind = Date()
+        }
     }
 
     fun packageToIntent() : Intent{
 
         val intent = Intent()
         intent.putExtra(NAME,name)
-        intent.putExtra(IMAGE,image)
+        //intent.putExtra(IMAGE,image)
         intent.putExtra(PHONENUMBER,phoneNumber)
         intent.putExtra(TIMETOREMIND,timeToRemind.toString())
         return intent
@@ -32,9 +54,12 @@ class ContactDetails {
     companion object{
 
         val NAME = "name"
-        val IMAGE = "image"
+      //  val IMAGE = "image"
         val PHONENUMBER = "phonenumber"
         val TIMETOREMIND = "timetoremind"
+
+        val FORMAT = SimpleDateFormat(
+            "yyyy-MM-dd HH:mm:ss", Locale.US)
     }
 
 
