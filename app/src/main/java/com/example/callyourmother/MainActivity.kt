@@ -21,7 +21,7 @@ class MainActivity : ListActivity() {
         super.onCreate(savedInstanceState)
         val listView = findViewById<ListView>(R.id.list)
 
-        listView.adapter = ContactAdapter
+        listView.adapter = ContactAdapter(this)
         setContentView(R.layout.activity_main)
         mAdapter = ContactAdapter(applicationContext)
 
