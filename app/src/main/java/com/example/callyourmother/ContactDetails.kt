@@ -41,6 +41,10 @@ class ContactDetails {
         }
     }
 
+    override fun toString(): String {
+        return (name + ITEM_SEP + phoneNumber + ITEM_SEP + frequency + ITEM_SEP
+                + FORMAT.format(timeToRemind))
+    }
     fun packageToIntent() : Intent{
 
         val intent = Intent()
@@ -53,6 +57,7 @@ class ContactDetails {
 
     companion object{
 
+        val ITEM_SEP = System.getProperty("line.separator")
         val NAME = "name"
       //  val IMAGE = "image"
         val PHONENUMBER = "phonenumber"

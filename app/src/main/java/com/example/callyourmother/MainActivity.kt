@@ -71,7 +71,7 @@ class MainActivity : ListActivity() {
 
             do {
                 name = reader.readLine();
-                if (title == null)
+                if (name == null)
                     break
                 //image = reader.readLine()
                 phoneNumber = reader.readLine()
