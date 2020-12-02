@@ -8,6 +8,7 @@ class ContactDetails {
     var name : String? = null
     var image: Bitmap? = null
     var phoneNumber : String? = null
+    var reminderFrequency : Int? = null
     var timeToRemind : Time? = null
     var isLate : Boolean = false
 
