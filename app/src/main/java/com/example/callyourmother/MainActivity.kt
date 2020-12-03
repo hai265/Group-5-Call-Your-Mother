@@ -4,13 +4,19 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import android.net.ParseException
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.util.Log
+import android.widget.AdapterView
 import android.widget.ListView
+import android.widget.TextView
+import android.widget.Toast
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.io.*
+import java.util.*
 
 
 class MainActivity : ListActivity() {
@@ -19,11 +25,12 @@ class MainActivity : ListActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        val listView = findViewById<ListView>(R.id.list)
 
-        listView.adapter = ContactAdapter(this)
+
         setContentView(R.layout.activity_main)
         mAdapter = ContactAdapter(applicationContext)
+        listView.adapter = mAdapter
+
 
         findViewById<FloatingActionButton>(R.id.addContactButton).setOnClickListener { view ->
             //TODO - Implement adding contact to calling circle functionality
@@ -31,8 +38,17 @@ class MainActivity : ListActivity() {
         }
 
         //TODO - Set OnItemClickListener on a contact so an options menu pops up
-
-
+        listView.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+                val contact = mAdapter.getItem(position) as ContactDetails
+                if(contact.name != null && contact.phoneNumber != null && contact.frequency != null && contact.timeToRemind != null){
+                    val intent = ContactDetails.packageToIntent(contact.name!!,contact.phoneNumber!!,contact.timeToRemind,
+                        contact.frequency!!
+                    )
+                    val startIntent = Intent(this@MainActivity, ContactSettingsActivity::class.java)
+                    startActivity(startIntent.putExtras(intent))
+                }
+            }
 
 
     }
@@ -73,15 +89,28 @@ class MainActivity : ListActivity() {
                     Log.i(TAG,"phone number: $phoneNo")
                     Log.i(TAG,"name: $name")
 
-                    val startContactSettingsActivityIntent = Intent(applicationContext,ContactSettingsActivity::class.java)
+                    //open contact settings activity page
+                    val startContactSettingsActivityIntent = Intent(this@MainActivity,ContactSettingsActivity::class.java)
                     startContactSettingsActivityIntent.putExtra(ContactDetails.NAME,name)
                     startContactSettingsActivityIntent.putExtra(ContactDetails.PHONENUMBER,phoneNo)
-                    startActivity(startContactSettingsActivityIntent)
+                    startActivityForResult(startContactSettingsActivityIntent, ADD_CONTACT_REQUEST)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
+        }
 
+        //Pressed "submit" on the contact settings page
+        else if (resultCode == RESULT_OK && requestCode == ADD_CONTACT_REQUEST){
+            val returnedIntent = Intent(data)
+            val createdToDoItem = ContactDetails(returnedIntent)
+            mAdapter.add(createdToDoItem)
+            mAdapter.notifyDataSetChanged()
+            Log.i(TAG, "Created toDoItem added")
+        }
+
+        //Pressed "cancel" on the contact settings page
+        if(resultCode == DELETE ) {
 
         }
     }
@@ -172,20 +201,81 @@ class MainActivity : ListActivity() {
 
     }
 
-    private fun loadItems(){
-        //TODO - Implement similar to lab 4's load items to retrieve the list information
+    private fun loadItems() {
+        var reader: BufferedReader? = null
+        try {
+            val fis = openFileInput(FILE_NAME)
+            reader = BufferedReader(InputStreamReader(fis))
+
+            var name: String? = null
+            var phoneNumber: String? = null
+            var frequencey: String? = null
+            var timeToRemind: Date? = null
+
+            do {
+                name = reader.readLine();
+                if (name == null)
+                    break
+                //image = reader.readLine()
+                phoneNumber = reader.readLine()
+                frequencey = reader.readLine()
+                timeToRemind = ContactDetails.FORMAT.parse(reader.readLine())
+                mAdapter.add(ContactDetails(name, phoneNumber, timeToRemind,frequencey))
+
+            }
+            while (true)
+
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        } finally {
+            if (null != reader) {
+                try {
+                    reader.close()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+
+            }
+        }
     }
     private fun saveItems(){
-        //TODO - Implement similar to lab 4's load items to store the list information
+        var writer: PrintWriter? = null
+        try {
+            val fos = openFileOutput(FILE_NAME, Context.MODE_PRIVATE)
+            writer = PrintWriter(
+                BufferedWriter(
+                    OutputStreamWriter(
+                        fos)
+                )
+            )
+
+            for (idx in 0 until mAdapter.count) {
+
+                writer.println(mAdapter.getItem(idx))
+
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } finally {
+            writer?.close()
+        }
     }
 
     companion object{
         private var hasPermission: Boolean = false
+
+        val ADD_CONTACT_REQUEST = 3224
         val PICK_CONTACT_REQUEST = 1
+        val DELETE = 189
         val TAG = "Group-5-Call-Your-Mother"
         val CHANNEL_ID = "channel_01"
         val NOTIFICATION_ID = 0
         private lateinit var mNotificationManager: NotificationManager
+        private val FILE_NAME = "TodoManagerActivityData.txt"
 
     }
 
