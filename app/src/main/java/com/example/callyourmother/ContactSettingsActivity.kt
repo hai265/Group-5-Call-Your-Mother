@@ -23,6 +23,8 @@ class ContactSettingsActivity : Activity() {
     private var mEditTextTime: EditText? = null
     private var mEditTextPersonName: EditText? = null
 
+    private var mContactPosition : Int? = null
+
 
 
 
@@ -63,7 +65,7 @@ class ContactSettingsActivity : Activity() {
 
         val saveButton = findViewById<View>(R.id.saveButton) as Button
         saveButton.setOnClickListener{
-            Log.i(TAG, "pressed submit")
+            Log.i(TAG, "pressed save")
 
             val name = mEditTextPersonName!!.text.toString()
             val phoneNumber = mEditTextPhoneNumber!!.text.toString()
@@ -78,6 +80,7 @@ class ContactSettingsActivity : Activity() {
         deleteButton.setOnClickListener{
             Log.i(TAG, "pressed delete")
             setResult(MainActivity.DELETE)
+            finish()
 
         }
     }

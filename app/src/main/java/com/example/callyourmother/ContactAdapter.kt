@@ -19,6 +19,11 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
         notifyDataSetChanged()
     }
 
+    fun remove (position : Int){
+        mContacts.removeAt(position)
+        notifyDataSetChanged()
+    }
+
     override fun getCount(): Int {
         return mContacts.size
     }
