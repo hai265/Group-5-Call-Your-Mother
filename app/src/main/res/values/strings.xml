@@ -11,4 +11,13 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="channel_name">channel_01</string>
     <string name="channel_description">channel description</string>
+    <string name="deleteButton">Delete</string>
+    <string name="cancelButton">Cancel</string>
+    <string name="saveButton">Save</string>
+    <string name="frequencyText">Reminder Frequency</string>
+    <string name="phoneNumberText">Phone Number</string>
+    <string name="timeTextView">Time to be reminded</string>
+    <string name="nameText">Contact Name</string>
+    <string name="default_frequency">1</string>
+
 </resources>

@@ -1,11 +1,14 @@
 package com.example.callmotherapplicationtest
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import java.util.*
 
 class ContactSettingsActivity : Activity() {
 
@@ -45,17 +48,40 @@ class ContactSettingsActivity : Activity() {
 
 
 
+        mEditTextPhoneNumber!!.setText(intent.getStringExtra(ContactDetails.PHONENUMBER).toString())
+        mEditTextPersonName!!.setText(intent.getStringExtra(ContactDetails.NAME).toString())
+        mEditTextTime!!.setText(Date().toString())
+        mEditTextTime!!
+
 
 
         val cancelButton = findViewById<View>(R.id.cancelButton) as Button
         cancelButton.setOnClickListener{
+            Log.i(TAG, "pressed cancel")
             finish()
         }
 
+        val saveButton = findViewById<View>(R.id.saveButton) as Button
+        saveButton.setOnClickListener{
+            Log.i(TAG, "pressed submit")
 
+            val name = mEditTextPersonName!!.text.toString()
+            val phoneNumber = mEditTextPhoneNumber!!.text.toString()
 
+            var returnIntent = ContactDetails.packageToIntent(name,phoneNumber, Date(),
+                mEditTextFrequency!!.text.toString().toInt())
+            setResult(Activity.RESULT_OK,returnIntent)
+            finish()
+        }
 
+        val deleteButton = findViewById<View>(R.id.deleteButton) as Button
+        deleteButton.setOnClickListener{
+            Log.i(TAG, "pressed delete")
+            setResult(MainActivity.DELETE)
 
-
+        }
+    }
+    companion object{
+        val TAG = "contactsettingsactivity"
     }
 }
