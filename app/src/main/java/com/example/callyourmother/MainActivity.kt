@@ -21,7 +21,8 @@ import java.util.*
 
 class MainActivity : ListActivity() {
 
-    internal lateinit var mAdapter: ContactAdapter
+    private lateinit var mAdapter: ContactAdapter
+    private lateinit var mAlarmManager: AlarmManager
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -30,7 +31,6 @@ class MainActivity : ListActivity() {
         setContentView(R.layout.activity_main)
         mAdapter = ContactAdapter(applicationContext)
         listView.adapter = mAdapter
-
 
         findViewById<FloatingActionButton>(R.id.addContactButton).setOnClickListener { view ->
             //TODO - Implement adding contact to calling circle functionality
@@ -46,11 +46,17 @@ class MainActivity : ListActivity() {
                         contact.frequency!!
                     )
                     val startIntent = Intent(this@MainActivity, ContactSettingsActivity::class.java)
-                    startActivity(startIntent.putExtras(intent))
+                    lastContactClicked = position
+                    startActivityForResult(startIntent.putExtras(intent), CLICK_CONTACT_REQUEST)
                 }
             }
 
+        //Load items if necessary
+        if (mAdapter.count == 0)
+            loadItems()
+        Log.i(TAG, "loaded items")
 
+        mAlarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
     }
 
     private fun pickContact(){
@@ -111,8 +117,12 @@ class MainActivity : ListActivity() {
 
         //Pressed "cancel" on the contact settings page
         if(resultCode == DELETE ) {
-
+            deleteContact(lastContactClicked)
         }
+    }
+    private fun deleteContact (position : Int){
+        Log.i(TAG, "Removed contact $position")
+        mAdapter.remove(position)
     }
 
     //choose a contact
@@ -147,23 +157,7 @@ class MainActivity : ListActivity() {
         }
     }
 
-    private fun createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.channel_name)
-            val descriptionText = getString(R.string.channel_description)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
 
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-                description = descriptionText
-            }
-            // Register the channel with the system
-            val mNotificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            mNotificationManager.createNotificationChannel(channel)
-        }
-    }
 
 
     // Notification to remind user to call someone. Tapping on the notification will open the phone app to call the person.
@@ -183,13 +177,12 @@ class MainActivity : ListActivity() {
         mNotificationManager.notify(NOTIFICATION_ID,notificationBuilder.build())
     }
 
-    public override fun onResume() {
-        super.onResume()
+    public override fun onStart() {
+        super.onStart()
 
         // Load saved ToDoItems, if necessary
 
-        if (mAdapter.count == 0)
-            loadItems()
+
     }
 
     override fun onPause() {
@@ -198,7 +191,7 @@ class MainActivity : ListActivity() {
         // Save ToDoItems
 
         saveItems()
-
+        Log.i(TAG, "saved items")
     }
 
     private fun loadItems() {
@@ -267,8 +260,9 @@ class MainActivity : ListActivity() {
 
     companion object{
         private var hasPermission: Boolean = false
-
-        val ADD_CONTACT_REQUEST = 3224
+        private val SECONDS = 1000
+        const val CLICK_CONTACT_REQUEST = 32123
+        const val ADD_CONTACT_REQUEST = 3224
         val PICK_CONTACT_REQUEST = 1
         val DELETE = 189
         val TAG = "Group-5-Call-Your-Mother"
@@ -276,6 +270,7 @@ class MainActivity : ListActivity() {
         val NOTIFICATION_ID = 0
         private lateinit var mNotificationManager: NotificationManager
         private val FILE_NAME = "TodoManagerActivityData.txt"
+        private var lastContactClicked = 0
 
     }
 
