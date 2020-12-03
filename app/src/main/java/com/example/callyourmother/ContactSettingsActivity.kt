@@ -1,11 +1,15 @@
 package com.example.callmotherapplicationtest
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.provider.CallLog
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import java.util.*
 
 class ContactSettingsActivity : Activity() {
 
@@ -45,17 +49,62 @@ class ContactSettingsActivity : Activity() {
 
 
 
+        mEditTextPhoneNumber!!.setText(intent.getStringExtra(ContactDetails.PHONENUMBER).toString())
+        mEditTextPersonName!!.setText(intent.getStringExtra(ContactDetails.NAME).toString())
+        mEditTextTime!!.setText(Date().toString())
+        mEditTextTime!!
+
 
 
         val cancelButton = findViewById<View>(R.id.cancelButton) as Button
         cancelButton.setOnClickListener{
+            Log.i(TAG, "pressed cancel")
             finish()
         }
 
+        val saveButton = findViewById<View>(R.id.saveButton) as Button
+        saveButton.setOnClickListener{
+            Log.i(TAG, "pressed submit")
+
+            val name = mEditTextPersonName!!.text.toString()
+            val phoneNumber = mEditTextPhoneNumber!!.text.toString()
+            var lastCalled = Calendar.getInstance().getTime()
+
+            val cursor = getContentResolver().query(
+                CallLog.Calls.CONTENT_URI, null,
+                null, null, null)
+
+            val number = cursor!!.getColumnIndex(CallLog.Calls.NUMBER)
+            val date = cursor!!.getColumnIndex(CallLog.Calls.DATE)
+
+            while (cursor.moveToNext()) {
+
+                val phNumber = cursor.getString(number)
+                val callDate = cursor.getString(date)
+                val updateDate =  ContactDetails.FORMAT.parse(callDate)
+
+                if(phoneNumber.equals(phNumber)){
+                    lastCalled = updateDate
+                    break
+                }
+            }
+            cursor.close()
 
 
+            var returnIntent = ContactDetails.packageToIntent(name,phoneNumber, lastCalled,
+                mEditTextFrequency!!.text.toString().toInt())
+            setResult(RESULT_OK,returnIntent)
+            finish()
+        }
 
+        val deleteButton = findViewById<View>(R.id.deleteButton) as Button
+        deleteButton.setOnClickListener{
+            Log.i(TAG, "pressed delete")
+            finish()
 
-
+        }
+    }
+    companion object{
+        val TAG = "contactsettingsactivity"
     }
 }

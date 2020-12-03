@@ -55,7 +55,8 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
             viewHolder = convertView.tag as ViewHolder
 
         viewHolder.nameView?.text = current.name
-        viewHolder.daysView?.text = ContactDetails.FORMAT.format(current.timeToRemind)
+        viewHolder.daysView?.text = ContactDetails.FORMAT.format(current.lastCalled)
+
         if(current.isLate)
             viewHolder.statusView?.text ="CALL NOW"
         else

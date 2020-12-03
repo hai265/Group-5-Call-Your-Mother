@@ -13,18 +13,18 @@ class ContactDetails {
    // var image: Bitmap? = null
     var phoneNumber : String? = null
     var frequency :Int? = null
-    var timeToRemind = Date()
+    var lastCalled = Date()
     var isLate : Boolean = false
 
-    internal constructor(name: String, phoneNumber: String, timeToRemind: Date, frequency : String){
+    internal constructor(name: String, phoneNumber: String, lastCalled: Date, frequency : String){
 
         this.name = name
         this.phoneNumber = phoneNumber
-        this.timeToRemind = timeToRemind
+        this.lastCalled = lastCalled
         this.frequency = frequency.toInt()
 
         var currentTime = Calendar.getInstance().getTime()
-        isLate = currentTime.after(timeToRemind)
+        isLate = currentTime.after(lastCalled)
 
 
     }
@@ -35,25 +35,22 @@ class ContactDetails {
         phoneNumber = intent.getStringExtra(PHONENUMBER)
         //pass in the time as a toString first
         try {
-            timeToRemind = FORMAT.parse(intent.getStringExtra(TIMETOREMIND))
+            lastCalled = FORMAT.parse(intent.getStringExtra(LASTCALLED))
         } catch (e: ParseException) {
-            timeToRemind = Date()
+            lastCalled = Date()
         }
     }
 
     override fun toString(): String {
         return (name + ITEM_SEP + phoneNumber + ITEM_SEP + frequency + ITEM_SEP
-                + FORMAT.format(timeToRemind))
+                + FORMAT.format(lastCalled))
     }
-    fun packageToIntent() : Intent{
 
-        val intent = Intent()
-        intent.putExtra(NAME,name)
-        //intent.putExtra(IMAGE,image)
-        intent.putExtra(PHONENUMBER,phoneNumber)
-        intent.putExtra(TIMETOREMIND,timeToRemind.toString())
-        return intent
+    fun updateLastCalled(update:Date){
+
+        lastCalled = update
     }
+
 
     companion object{
 
@@ -61,10 +58,22 @@ class ContactDetails {
         val NAME = "name"
       //  val IMAGE = "image"
         val PHONENUMBER = "phonenumber"
-        val TIMETOREMIND = "timetoremind"
+        val LASTCALLED = "lastCalled"
+        val FREQUENCY = "frequency"
 
         val FORMAT = SimpleDateFormat(
             "yyyy-MM-dd HH:mm:ss", Locale.US)
+
+        fun packageToIntent(name : String, phoneNumber: String, lastCalled: Date, frequency: Int) : Intent{
+
+            val intent = Intent()
+            intent.putExtra(NAME,name)
+            //intent.putExtra(IMAGE,image)
+            intent.putExtra(PHONENUMBER,phoneNumber)
+            intent.putExtra(LASTCALLED,lastCalled.toString())
+            intent.putExtra(FREQUENCY,frequency)
+            return intent
+        }
     }
 
 

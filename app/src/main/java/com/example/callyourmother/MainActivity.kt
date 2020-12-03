@@ -8,9 +8,9 @@ import android.net.ParseException
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.CallLog
 import android.provider.ContactsContract
 import android.util.Log
-import android.widget.ListView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.*
 import java.util.*
@@ -20,6 +20,7 @@ class MainActivity : ListActivity() {
 
     internal lateinit var mAdapter: ContactAdapter
     private lateinit var mNotificationManager: NotificationManager
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -34,7 +35,36 @@ class MainActivity : ListActivity() {
             pickContact()
         }
 
-        //TODO - Set OnItemClickListener on a contact so an options menu pops up
+
+        //Updates the last call date of the ContactDetails
+        val cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, null,
+            null, null, null)
+
+        val number = cursor!!.getColumnIndex(CallLog.Calls.NUMBER)
+        val date = cursor!!.getColumnIndex(CallLog.Calls.DATE)
+        val numberChecked = ArrayList<String>()
+
+        //goes through the phone log and get the information
+        while (cursor.moveToNext()) {
+
+            val phNumber = cursor.getString(number)
+            val callDate = cursor.getString(date)
+            val updateDate =  ContactDetails.FORMAT.parse(callDate)
+
+            //runs through the adapter to see if the phone number matches any in the adapter
+            for (idx in 0 until mAdapter.count) {
+
+                var contact = mAdapter.getItem(idx) as ContactDetails
+
+                //if matches, and have not already been checked, will update the last call date
+                if(contact.phoneNumber.equals(phNumber) && !numberChecked.contains(phNumber)){
+                    contact.updateLastCalled(updateDate)
+                    numberChecked.add(phNumber)
+                }
+
+            }
+        }
+        cursor.close()
 
     }
 
@@ -71,51 +101,26 @@ class MainActivity : ListActivity() {
                     name = cursor.getString(nameIndex)
                     // Set the value to the textviews
 
-                    Log.i(TAG,"phone number: $phoneNo")
-                    Log.i(TAG,"name: $name")
+                    Log.i(TAG, "phone number: $phoneNo")
+                    Log.i(TAG, "name: $name")
 
-                    val startContactSettingsActivityIntent = Intent(applicationContext,ContactSettingsActivity::class.java)
-                    startContactSettingsActivityIntent.putExtra(ContactDetails.NAME,name)
-                    startContactSettingsActivityIntent.putExtra(ContactDetails.PHONENUMBER,phoneNo)
+                    val startContactSettingsActivityIntent =
+                        Intent(applicationContext, ContactSettingsActivity::class.java)
+                    startContactSettingsActivityIntent.putExtra(ContactDetails.NAME, name)
+                    startContactSettingsActivityIntent.putExtra(ContactDetails.PHONENUMBER, phoneNo)
                     startActivity(startContactSettingsActivityIntent)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
-
-
         }
-    }
 
-    //choose a contact
-    private fun contactPicked(data: Intent) {
-        var cursor: Cursor? = null
-        try {
-
-            var phoneNo: String? = null
-            var name: String? = null
-            // getData() method will have the Content Uri of the selected contact
-            val uri: Uri? = data.data
-            //Query the content uri
-            cursor = uri?.let { getContentResolver().query(it, null, null, null, null) };
-            cursor?.moveToFirst()
-            // column index of the phone number
-            val phoneIndex: Int =
-                cursor!!.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-            // column index of the email
-
-            // column index of the contact name
-            val nameIndex: Int =
-                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-
-            phoneNo = cursor.getString(phoneIndex)
-            name = cursor.getString(nameIndex)
-            // Set the value to the textviews
-
-            Log.i(TAG,"phone number: $phoneNo")
-            Log.i(TAG,"name: $name")
-        } catch (e: Exception) {
-            e.printStackTrace()
+        else if (resultCode == RESULT_OK && requestCode == ADD_CONTACT_REQUEST){
+            val returnedIntent = Intent(data)
+            val createdToDoItem = ContactDetails(returnedIntent)
+            mAdapter.add(createdToDoItem)
+            mAdapter.notifyDataSetChanged()
+            Log.i(TAG, "Created toDoItem added")
         }
     }
 
@@ -178,12 +183,13 @@ class MainActivity : ListActivity() {
         var reader: BufferedReader? = null
         try {
             val fis = openFileInput(FILE_NAME)
+            Log.d(TAG, getFileStreamPath(FILE_NAME).toString())
             reader = BufferedReader(InputStreamReader(fis))
 
             var name: String? = null
             var phoneNumber: String? = null
             var frequencey: String? = null
-            var timeToRemind: Date? = null
+            var lastCalled: Date? = null
 
             do {
                 name = reader.readLine();
@@ -192,8 +198,8 @@ class MainActivity : ListActivity() {
                 //image = reader.readLine()
                 phoneNumber = reader.readLine()
                 frequencey = reader.readLine()
-                timeToRemind = ContactDetails.FORMAT.parse(reader.readLine())
-                mAdapter.add(ContactDetails(name, phoneNumber, timeToRemind,frequencey))
+                lastCalled = ContactDetails.FORMAT.parse(reader.readLine())
+                mAdapter.add(ContactDetails(name, phoneNumber, lastCalled,frequencey))
 
             }
             while (true)
@@ -241,6 +247,7 @@ class MainActivity : ListActivity() {
 
     companion object {
         private var hasPermission: Boolean = false
+        val ADD_CONTACT_REQUEST = 3224
         val PICK_CONTACT_REQUEST = 1
         val TAG = "Group-5-Call-Your-Mother"
         val CHANNEL_ID = "channel_01"
