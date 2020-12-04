@@ -60,7 +60,8 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
             viewHolder = convertView.tag as ViewHolder
 
         viewHolder.nameView?.text = current.name
-        viewHolder.daysView?.text = ContactDetails.FORMAT.format(current.timeToRemind)
+        viewHolder.daysView?.text = ContactDetails.FORMAT.format(current.lastCalled)
+
         if(current.isLate)
             viewHolder.statusView?.text ="CALL NOW"
         else
@@ -73,7 +74,7 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
     internal class ViewHolder{
         var position: Int = 0
         var mContactLayout: ConstraintLayout? = null
-        //    var imageView : ImageView? = null
+    //    var imageView : ImageView? = null
         var nameView : TextView? = null
         var statusView : TextView? = null
         var daysView: TextView? = null
