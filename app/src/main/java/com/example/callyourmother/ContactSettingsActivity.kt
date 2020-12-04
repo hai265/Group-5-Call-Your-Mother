@@ -3,6 +3,7 @@ package com.example.callmotherapplicationtest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.provider.CallLog
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -69,10 +70,32 @@ class ContactSettingsActivity : Activity() {
 
             val name = mEditTextPersonName!!.text.toString()
             val phoneNumber = mEditTextPhoneNumber!!.text.toString()
+            var lastCalled = Calendar.getInstance().getTime()
 
-            var returnIntent = ContactDetails.packageToIntent(name,phoneNumber, Date(),
+            val cursor = getContentResolver().query(
+                CallLog.Calls.CONTENT_URI, null,
+                null, null, null)
+
+            val number = cursor!!.getColumnIndex(CallLog.Calls.NUMBER)
+            val date = cursor!!.getColumnIndex(CallLog.Calls.DATE)
+
+            while (cursor.moveToNext()) {
+
+                val phNumber = cursor.getString(number)
+                val callDate = cursor.getString(date)
+                val updateDate =  ContactDetails.FORMAT.parse(callDate)
+
+                if(phoneNumber.equals(phNumber)){
+                    lastCalled = updateDate
+                    break
+                }
+            }
+            cursor.close()
+
+
+            var returnIntent = ContactDetails.packageToIntent(name,phoneNumber, lastCalled,
                 mEditTextFrequency!!.text.toString().toInt())
-            setResult(Activity.RESULT_OK,returnIntent)
+            setResult(RESULT_OK,returnIntent)
             finish()
         }
 
