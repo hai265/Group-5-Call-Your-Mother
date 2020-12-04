@@ -1,8 +1,10 @@
 package com.example.callmotherapplicationtest
 
+import android.Manifest
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.ParseException
 import android.net.Uri
@@ -32,9 +34,43 @@ class MainActivity : ListActivity() {
 
         findViewById<FloatingActionButton>(R.id.addContactButton).setOnClickListener { view ->
             //TODO - Implement adding contact to calling circle functionality
+            if (needsRuntimePermission()) {
+                requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS), PERMISSION_TO_READ_CONTACT)
+            }
             pickContact()
         }
 
+        if (needsRuntimePermission()) {
+            requestPermissions(arrayOf(Manifest.permission.READ_CALL_LOG), PERMISSION_TO_READ_LOGS)
+        }
+        else
+           readCallLogs()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSION_TO_READ_CONTACT -> {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    pickContact()
+                } else {
+                    Log.i(TAG, "Phone Number was not loaded --- Permission was not granted")
+                }
+                return
+            }
+            PERMISSION_TO_READ_LOGS -> {
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    readCallLogs()
+                } else {
+                    Log.i(TAG, "Call Log was not loaded --- Permission was not granted")
+                }
+                return
+
+            }
+        }
+    }
+    private fun readCallLogs(){
 
         //Updates the last call date of the ContactDetails
         val cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, null,
@@ -65,9 +101,7 @@ class MainActivity : ListActivity() {
             }
         }
         cursor.close()
-
     }
-
     private fun pickContact(){
         val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
         intent.resolveActivity(packageManager)?.let {
@@ -245,6 +279,14 @@ class MainActivity : ListActivity() {
         }
     }
 
+    private fun needsRuntimePermission(): Boolean {
+        // Check the SDK version and whether the permission is already granted.
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED &&
+                checkSelfPermission(Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED
+    }
+
+
     companion object {
         private var hasPermission: Boolean = false
         val ADD_CONTACT_REQUEST = 3224
@@ -253,6 +295,8 @@ class MainActivity : ListActivity() {
         val CHANNEL_ID = "channel_01"
         val NOTIFICATION_ID = 0
         private val FILE_NAME = "ContactsData.txt"
+        val PERMISSION_TO_READ_CONTACT = 4
+        val PERMISSION_TO_READ_LOGS = 5
     }
 
 }
