@@ -192,7 +192,6 @@ class MainActivity : ListActivity() {
             val returnedIntent = Intent(data)
                 //.putExtra(ContactDetails.INTENT,mNotificationReceiverPendingIntent)
 
-
             val createdContact= ContactDetails(returnedIntent)
             val mNotificationReceiverIntent = Intent(
                 this@MainActivity,
@@ -210,14 +209,23 @@ class MainActivity : ListActivity() {
             Log.i(TAG, "Contact added")
             mAdapter.add(createdContact)
 
-
-            // Set repeating alarm 5 seconds
+            // Set repeating alarm 5 seconds FOR DEBUGGING PURPOSES
             mAlarmManager.setRepeating(
-                AlarmManager.RTC_WAKEUP,
-                2000,
-                2000,
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                5000,
+                5000,
                 mNotificationReceiverPendingIntent
             )
+
+            // Actual alarm setter
+//            mAlarmManager.setRepeating(
+//                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+//                AlarmManager.INTERVAL_DAY * createdContact.frequency!!,
+//                AlarmManager.INTERVAL_DAY,
+//                mNotificationReceiverPendingIntent
+//            )
+
+
             Log.i(TAG,"Alarm for ${returnedIntent.getStringExtra(ContactDetails.NAME)} created")
 
 
@@ -275,7 +283,10 @@ class MainActivity : ListActivity() {
                 val mNotificationReceiverIntent = Intent(
                     this@MainActivity,
                     AlarmNotificationReceiver::class.java
-                )
+
+                ).putExtra(ContactDetails.NAME,name)
+                    .putExtra(ContactDetails.PHONENUMBER,phoneNumber)
+
 
                 val mNotificationReceiverPendingIntent =
                     PendingIntent.getBroadcast(
