@@ -26,9 +26,11 @@ class ContactDetails {
         this.frequency = frequency.toInt()
 
         var currentTime = Calendar.getInstance().getTime()
-        isLate = currentTime.after(lastCalled)
-
-
+        var cLastCalled = Calendar.getInstance()
+        cLastCalled.setTime(lastCalled)
+        cLastCalled.add(Calendar.DATE, this.frequency!!)
+        var lateDate = cLastCalled.getTime()
+        isLate = currentTime.after(lateDate)
     }
 
     internal constructor(intent: Intent){
