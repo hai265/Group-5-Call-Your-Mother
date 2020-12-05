@@ -32,7 +32,9 @@ class ContactDetails {
         var lateDate = cLastCalled.getTime()
         isLate = currentTime.after(lateDate)
 
+
         checkIfLate()
+
 
     }
 
@@ -68,6 +70,12 @@ class ContactDetails {
         checkIfLate()
     }
 
+    fun getUniqueID() : Int{
+        val unformattedPhoneNumber = phoneNumber?.replace("\\D".toRegex(),"" )
+        return if (unformattedPhoneNumber != null) {
+            unformattedPhoneNumber.toLong().toInt()
+        } else 0
+    }
 
     //a private function to check if the user is late or not
     private fun checkIfLate(){
@@ -80,12 +88,7 @@ class ContactDetails {
 
         isLate = currentTime.after(lateDate)
     }
-    fun getUniqueID() : Int{
-        val unformattedPhoneNumber = phoneNumber?.replace("\\D".toRegex(),"" )
-        return if (unformattedPhoneNumber != null) {
-            unformattedPhoneNumber.toLong().toInt()
-        } else 0
-    }
+
 
     fun remindContact() {
 

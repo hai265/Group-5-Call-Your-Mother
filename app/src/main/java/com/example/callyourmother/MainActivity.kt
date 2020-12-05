@@ -130,6 +130,28 @@ class MainActivity : ListActivity() {
         }
         cursor.close()
 
+
+
+        listView.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+                val contact = mAdapter.getItem(position) as ContactDetails
+                if(contact.name != null && contact.phoneNumber != null && contact.frequency != null && contact.lastCalled != null){
+                    val intent = ContactDetails.packageToIntent(contact.name!!,contact.phoneNumber!!,contact.lastCalled,
+                        contact.frequency!!
+                    )
+                    val startIntent = Intent(this@MainActivity, ContactSettingsActivity::class.java)
+                    lastContactClicked = position
+                    startActivityForResult(startIntent.putExtras(intent), CLICK_CONTACT_REQUEST)
+                }
+            }
+
+        //Load items if necessary
+        if (mAdapter.count == 0)
+            loadItems()
+        Log.i(TAG, "loaded items")
+
+        mAlarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
     }
 
     private fun pickContact(){
@@ -186,6 +208,7 @@ class MainActivity : ListActivity() {
 
             val returnedIntent = Intent(data)
                 //.putExtra(ContactDetails.INTENT,mNotificationReceiverPendingIntent)
+
             val createdContact= ContactDetails(returnedIntent)
             val mNotificationReceiverIntent = Intent(
                 this@MainActivity,
@@ -210,6 +233,7 @@ class MainActivity : ListActivity() {
                 5000,
                 mNotificationReceiverPendingIntent
             )
+
             // Actual alarm setter
 //            mAlarmManager.setRepeating(
 //                AlarmManager.ELAPSED_REALTIME_WAKEUP,
@@ -217,6 +241,8 @@ class MainActivity : ListActivity() {
 //                AlarmManager.INTERVAL_DAY,
 //                mNotificationReceiverPendingIntent
 //            )
+
+
             Log.i(TAG,"Alarm for ${returnedIntent.getStringExtra(ContactDetails.NAME)} created")
 
 
@@ -275,8 +301,10 @@ class MainActivity : ListActivity() {
                 val mNotificationReceiverIntent = Intent(
                     this@MainActivity,
                     AlarmNotificationReceiver::class.java
+
                 ).putExtra(ContactDetails.NAME,name)
                     .putExtra(ContactDetails.PHONENUMBER,phoneNumber)
+
 
                 val mNotificationReceiverPendingIntent =
                     PendingIntent.getBroadcast(
