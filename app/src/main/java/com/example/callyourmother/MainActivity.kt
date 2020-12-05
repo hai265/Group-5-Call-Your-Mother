@@ -72,6 +72,8 @@ class MainActivity : ListActivity() {
             }
         }
     }
+
+    //Based on StackOverFlow
     private fun readCallLogs(){
 
         //Updates the last call date of the ContactDetails
