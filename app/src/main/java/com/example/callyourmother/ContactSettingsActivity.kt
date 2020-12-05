@@ -81,7 +81,8 @@ class ContactSettingsActivity : Activity() {
 
                 val phNumber = cursor.getString(number)
                 val callDate = cursor.getString(date)
-                val updateDate =  ContactDetails.FORMAT.parse(callDate)
+                val callDayTime = Date(java.lang.Long.valueOf(callDate))
+                val updateDate =  ContactDetails.FORMAT.parse(callDayTime.toString())
 
                 if(phoneNumber.equals(phNumber)){
                     lastCalled = updateDate
