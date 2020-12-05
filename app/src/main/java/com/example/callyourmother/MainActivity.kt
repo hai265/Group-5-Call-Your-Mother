@@ -262,7 +262,6 @@ class MainActivity : ListActivity() {
         var reader: BufferedReader? = null
         try {
             val fis = openFileInput(FILE_NAME)
-            Log.d(TAG, getFileStreamPath(FILE_NAME).toString())
             reader = BufferedReader(InputStreamReader(fis))
 
             var name: String? = null
