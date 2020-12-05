@@ -32,7 +32,7 @@ class ContactSettingsActivity : Activity() {
 
     override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
-        // TODO Implement the contact settings activity
+
 
         setContentView(R.layout.contact_settings)
 
