@@ -43,6 +43,7 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
     }
 
     override fun getItemId(position: Int): Long {
+
         return position.toLong()
     }
 
