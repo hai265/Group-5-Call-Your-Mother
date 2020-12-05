@@ -1,8 +1,10 @@
 package com.example.callmotherapplicationtest
 
+import android.Manifest
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.ParseException
 import android.net.Uri
@@ -12,9 +14,7 @@ import android.provider.CallLog
 import android.provider.ContactsContract
 import android.util.Log
 import android.widget.AdapterView
-import android.widget.ListView
-import android.widget.TextView
-import android.widget.Toast
+import com.example.callyourmother.AlarmNotificationReceiver
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.*
 import java.util.*
@@ -24,6 +24,7 @@ class MainActivity : ListActivity() {
 
     private lateinit var mAdapter: ContactAdapter
     private lateinit var mAlarmManager: AlarmManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -35,9 +36,43 @@ class MainActivity : ListActivity() {
 
         findViewById<FloatingActionButton>(R.id.addContactButton).setOnClickListener { view ->
             //TODO - Implement adding contact to calling circle functionality
+            if (needsRuntimePermission()) {
+                requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS), PERMISSION_TO_READ_CONTACT)
+            }
             pickContact()
         }
 
+        if (needsRuntimePermission()) {
+            requestPermissions(arrayOf(Manifest.permission.READ_CALL_LOG), PERMISSION_TO_READ_LOGS)
+        }
+        else
+           readCallLogs()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSION_TO_READ_CONTACT -> {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    pickContact()
+                } else {
+                    Log.i(TAG, "Phone Number was not loaded --- Permission was not granted")
+                }
+                return
+            }
+            PERMISSION_TO_READ_LOGS -> {
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    readCallLogs()
+                } else {
+                    Log.i(TAG, "Call Log was not loaded --- Permission was not granted")
+                }
+                return
+
+            }
+        }
+    }
+    private fun readCallLogs(){
 
         //Updates the last call date of the ContactDetails
         val cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, null,
@@ -52,7 +87,10 @@ class MainActivity : ListActivity() {
 
             val phNumber = cursor.getString(number)
             val callDate = cursor.getString(date)
-            val updateDate =  ContactDetails.FORMAT.parse(callDate)
+
+            val callDayTime = Date(java.lang.Long.valueOf(callDate))
+            Log.d(TAG, "The call date is:"+ callDayTime.toString())
+            val updateDate =  ContactDetails.FORMAT.parse(callDayTime.toString())
 
             //runs through the adapter to see if the phone number matches any in the adapter
             for (idx in 0 until mAdapter.count) {
@@ -140,45 +178,58 @@ class MainActivity : ListActivity() {
 
         //Pressed "submit" on the contact settings page
         else if (resultCode == RESULT_OK && requestCode == ADD_CONTACT_REQUEST){
-            val returnedIntent = Intent(data)
-            val createdToDoItem = ContactDetails(returnedIntent)
-            mAdapter.add(createdToDoItem)
+
+            val mNotificationReceiverIntent = Intent(
+                this@MainActivity,
+                AlarmNotificationReceiver::class.java
+            ).putExtras(Intent(data))
+
+            val mNotificationReceiverPendingIntent =
+                PendingIntent.getBroadcast(
+                    this@MainActivity,
+                    notificationID++, mNotificationReceiverIntent, 0
+                )
+
+            val returnedIntent = Intent(data).putExtra(ContactDetails.INTENT,mNotificationReceiverPendingIntent)
+
+
+            val createdContact= ContactDetails(returnedIntent)
+            createdContact.setNotificationPendingIntent(mNotificationReceiverPendingIntent)
+
             mAdapter.notifyDataSetChanged()
-            Log.i(TAG, "Created toDoItem added")
+            Log.i(TAG, "Contact added")
+            mAdapter.add(createdContact)
+
+
+            // Set repeating alarm 5 seconds
+            mAlarmManager.setRepeating(
+                AlarmManager.RTC_WAKEUP,
+                2000,
+                2000,
+                mNotificationReceiverPendingIntent
+            )
+            Log.i(TAG,"Alarm for ${returnedIntent.getStringExtra(ContactDetails.NAME)} created")
+            //TODO - Multiple Alarm not working
+//            mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+//                SystemClock.elapsedRealtime() + 10 * 1000,
+//                10 * 1000,
+//                mAdapter.getPendingIntent(mAdapter.count - 1)
+//            )
+
         }
 
-        //Pressed "cancel" on the contact settings page
-        if(resultCode == DELETE ) {
+        //Pressed "delete" on the contact settings page. Deletes the contact from the list and also cancels the alarm
+        if(resultCode == DELETE) {
+            val contact = mAdapter.getItem(lastContactClicked)
+            mAlarmManager.cancel(contact.notificationIntent)
             deleteContact(lastContactClicked)
+
         }
     }
     private fun deleteContact (position : Int){
         Log.i(TAG, "Removed contact $position")
         mAdapter.remove(position)
     }
-
-
-
-
-
-
-    // Notification to remind user to call someone. Tapping on the notification will open the phone app to call the person.
-    fun notify(name : String, phoneNumber : String){
-        val mCallIntent = Intent(Intent.ACTION_DIAL,Uri.parse(phoneNumber))
-
-        val mContentIntent = PendingIntent.getActivity(applicationContext, 0, mCallIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        val notificationBuilder = Notification.Builder(
-            applicationContext, CHANNEL_ID
-        )
-            .setTicker("tickerText")
-            .setSmallIcon(android.R.drawable.stat_sys_warning)
-            .setAutoCancel(true)
-            .setContentTitle("Call $name")
-            .setContentText("Reminder to call $name, tap to call now.")
-            .setContentIntent(mContentIntent)
-        mNotificationManager.notify(NOTIFICATION_ID,notificationBuilder.build())
-    }
-
 
 
     override fun onPause() {
@@ -256,7 +307,15 @@ class MainActivity : ListActivity() {
         }
     }
 
-    companion object{
+    private fun needsRuntimePermission(): Boolean {
+        // Check the SDK version and whether the permission is already granted.
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+
+                checkSelfPermission(Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED
+    }
+
+
+    companion object {
         private var hasPermission: Boolean = false
         private val SECONDS = 1000
         const val CLICK_CONTACT_REQUEST = 32123
@@ -268,8 +327,10 @@ class MainActivity : ListActivity() {
         val NOTIFICATION_ID = 0
         private lateinit var mNotificationManager: NotificationManager
         private val FILE_NAME = "ContactsData.txt"
-        private var lastContactClicked = 0
-
+        val PERMISSION_TO_READ_CONTACT = 4
+        val PERMISSION_TO_READ_LOGS = 5
+        var lastContactClicked = 0
+        private var notificationID = 0
     }
 
 }
