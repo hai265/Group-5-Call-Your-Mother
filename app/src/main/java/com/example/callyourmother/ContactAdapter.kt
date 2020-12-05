@@ -74,7 +74,7 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
         viewHolder.daysView?.text = ContactDetails.FORMAT.format(current.lastCalled)
 
         if(current.isLate)
-            viewHolder.statusView?.text ="CALL NOW"
+            viewHolder.statusView?.text ="Call Now"
         else
             viewHolder.statusView?.text ="No need to call"
 
