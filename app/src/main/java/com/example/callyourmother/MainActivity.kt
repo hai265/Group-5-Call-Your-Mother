@@ -35,7 +35,7 @@ class MainActivity : ListActivity() {
         listView.adapter = mAdapter
 
         findViewById<FloatingActionButton>(R.id.addContactButton).setOnClickListener { view ->
-            //TODO - Implement adding contact to calling circle functionality
+
             if (needsRuntimePermission()) {
                 requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS), PERMISSION_TO_READ_CONTACT)
             }
@@ -107,7 +107,7 @@ class MainActivity : ListActivity() {
         }
         cursor.close()
 
-        //TODO - Set OnItemClickListener on a contact so an options menu pops up
+
         listView.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 val contact = mAdapter.getItem(position) as ContactDetails
@@ -179,21 +179,23 @@ class MainActivity : ListActivity() {
         //Pressed "submit" on the contact settings page
         else if (resultCode == RESULT_OK && requestCode == ADD_CONTACT_REQUEST){
 
+
+
+            val returnedIntent = Intent(data)
+                //.putExtra(ContactDetails.INTENT,mNotificationReceiverPendingIntent)
+
+
+            val createdContact= ContactDetails(returnedIntent)
             val mNotificationReceiverIntent = Intent(
                 this@MainActivity,
                 AlarmNotificationReceiver::class.java
-            ).putExtras(Intent(data))
+            ).putExtras(returnedIntent)
 
             val mNotificationReceiverPendingIntent =
                 PendingIntent.getBroadcast(
                     this@MainActivity,
-                    notificationID++, mNotificationReceiverIntent, 0
+                    createdContact.getUniqueID(), mNotificationReceiverIntent, 0
                 )
-
-            val returnedIntent = Intent(data).putExtra(ContactDetails.INTENT,mNotificationReceiverPendingIntent)
-
-
-            val createdContact= ContactDetails(returnedIntent)
             createdContact.setNotificationPendingIntent(mNotificationReceiverPendingIntent)
 
             mAdapter.notifyDataSetChanged()
@@ -209,26 +211,25 @@ class MainActivity : ListActivity() {
                 mNotificationReceiverPendingIntent
             )
             Log.i(TAG,"Alarm for ${returnedIntent.getStringExtra(ContactDetails.NAME)} created")
-            //TODO - Multiple Alarm not working
-//            mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-//                SystemClock.elapsedRealtime() + 10 * 1000,
-//                10 * 1000,
-//                mAdapter.getPendingIntent(mAdapter.count - 1)
-//            )
+
 
         }
 
         //Pressed "delete" on the contact settings page. Deletes the contact from the list and also cancels the alarm
         if(resultCode == DELETE) {
             val contact = mAdapter.getItem(lastContactClicked)
-            mAlarmManager.cancel(contact.notificationIntent)
+            if(contact.notificationIntent != null) {
+                mAlarmManager.cancel(contact.notificationIntent)
+            }
             deleteContact(lastContactClicked)
-
         }
     }
+    //TODO - Remove alarm when deleting the contact
     private fun deleteContact (position : Int){
         Log.i(TAG, "Removed contact $position")
+        mAlarmManager.cancel(mAdapter.getItem(position).notificationIntent)
         mAdapter.remove(position)
+
     }
 
 
@@ -262,8 +263,22 @@ class MainActivity : ListActivity() {
                 phoneNumber = reader.readLine()
                 frequencey = reader.readLine()
                 lastCalled = ContactDetails.FORMAT.parse(reader.readLine())
-               // notificationIntent = reader.readLine().to
-                mAdapter.add(ContactDetails(name, phoneNumber, lastCalled,frequencey))
+                //Rebuild the notification pending intent
+                val createdContact = ContactDetails(name, phoneNumber, lastCalled,frequencey)
+                val mNotificationReceiverIntent = Intent(
+                    this@MainActivity,
+                    AlarmNotificationReceiver::class.java
+                )
+
+                val mNotificationReceiverPendingIntent =
+                    PendingIntent.getBroadcast(
+                        this@MainActivity,
+                        createdContact.getUniqueID(), mNotificationReceiverIntent, 0
+                    )
+
+                createdContact.setNotificationPendingIntent(mNotificationReceiverPendingIntent)
+                mAdapter.add(createdContact)
+
 
             }
             while (true)
