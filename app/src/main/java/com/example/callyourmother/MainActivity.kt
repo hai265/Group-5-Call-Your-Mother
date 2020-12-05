@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.CallLog
 import android.provider.ContactsContract
+import android.telephony.PhoneNumberUtils
 import android.util.Log
 import android.widget.AdapterView
 import com.example.callyourmother.AlarmNotificationReceiver
@@ -42,13 +43,6 @@ class MainActivity : ListActivity() {
             pickContact()
         }
 
-        if (needsRuntimePermission()) {
-            requestPermissions(arrayOf(Manifest.permission.READ_CALL_LOG), PERMISSION_TO_READ_LOGS)
-        }
-        else
-           readCallLogs()
-
-
 
         listView.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
@@ -64,12 +58,17 @@ class MainActivity : ListActivity() {
             }
 
         //Load items if necessary
-        if (mAdapter.count == 0) {
+        if (mAdapter.count == 0)
             loadItems()
-            Log.i(TAG, "loaded items")
-        }
+        Log.i(TAG, "loaded items")
 
         mAlarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        if (needsRuntimePermission()) {
+            requestPermissions(arrayOf(Manifest.permission.READ_CALL_LOG), PERMISSION_TO_READ_LOGS)
+        }
+        else
+           readCallLogs()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
@@ -95,63 +94,47 @@ class MainActivity : ListActivity() {
             }
         }
     }
+
+    //Based on StackOverFlow
     private fun readCallLogs(){
 
+        Log.i(TAG, "Enter readCallLog")
         //Updates the last call date of the ContactDetails
         val cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, null,
             null, null, null)
 
         val number = cursor!!.getColumnIndex(CallLog.Calls.NUMBER)
         val date = cursor!!.getColumnIndex(CallLog.Calls.DATE)
-        val numberChecked = ArrayList<String>()
 
         //goes through the phone log and get the information
         while (cursor.moveToNext()) {
 
-            val phNumber = cursor.getString(number)
+            val phNumber = PhoneNumberUtils.formatNumber(cursor.getString(number),Locale.getDefault().getCountry())
             val callDate = cursor.getString(date)
 
             val callDayTime = Date(java.lang.Long.valueOf(callDate))
-            Log.d(TAG, "The call date is:"+ callDayTime.toString())
             val updateDate =  ContactDetails.FORMAT.parse(callDayTime.toString())
+            Log.i(TAG, "The call date is: "+ updateDate.toString())
+
+            Log.i(TAG, "Call Log Phone Number: " + phNumber)
 
             //runs through the adapter to see if the phone number matches any in the adapter
             for (idx in 0 until mAdapter.count) {
 
-                var contact = mAdapter.getItem(idx) as ContactDetails
+                var contact = mAdapter.getItem(idx)
+                Log.i(TAG, "Contact's Phone Number: " + contact.phoneNumber)
 
-                //if matches, and have not already been checked, will update the last call date
-                if(contact.phoneNumber.equals(phNumber) && !numberChecked.contains(phNumber)){
+                //if matches will update the last call date
+                if(contact.phoneNumber.equals(phNumber)){
                     contact.updateLastCalled(updateDate)
-                    numberChecked.add(phNumber)
+
+
+                    Log.i(TAG, "Updated the lastCalledDate")
                 }
 
             }
         }
         cursor.close()
-
-
-
-        listView.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, view, position, id ->
-                val contact = mAdapter.getItem(position) as ContactDetails
-                if(contact.name != null && contact.phoneNumber != null && contact.frequency != null && contact.lastCalled != null){
-                    val intent = ContactDetails.packageToIntent(contact.name!!,contact.phoneNumber!!,contact.lastCalled,
-                        contact.frequency!!
-                    )
-                    val startIntent = Intent(this@MainActivity, ContactSettingsActivity::class.java)
-                    lastContactClicked = position
-                    startActivityForResult(startIntent.putExtras(intent), CLICK_CONTACT_REQUEST)
-                }
-            }
-
-        //Load items if necessary
-        if (mAdapter.count == 0)
-            loadItems()
-        Log.i(TAG, "loaded items")
-
-        mAlarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
     }
 
     private fun pickContact(){

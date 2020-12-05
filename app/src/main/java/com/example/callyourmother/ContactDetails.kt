@@ -25,21 +25,10 @@ class ContactDetails {
         this.lastCalled = lastCalled
         this.frequency = frequency.toInt()
 
-        var currentTime = Calendar.getInstance().getTime()
-        var cLastCalled = Calendar.getInstance()
-        cLastCalled.setTime(lastCalled)
-        cLastCalled.add(Calendar.DATE, this.frequency!!)
-        var lateDate = cLastCalled.getTime()
-        isLate = currentTime.after(lateDate)
-
-
         checkIfLate()
-
-
     }
 
     internal constructor(intent: Intent){
-
         name = intent.getStringExtra(NAME)
        // image = intent.getParcelableExtra(IMAGE)
         phoneNumber = intent.getStringExtra(PHONENUMBER)
