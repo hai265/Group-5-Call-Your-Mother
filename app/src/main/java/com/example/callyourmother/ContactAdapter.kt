@@ -33,6 +33,10 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
         notifyDataSetChanged()
     }
 
+    fun editContact(position : Int, frequency : Int){
+        mContacts[position].frequency = frequency
+    }
+
 
     override fun getCount(): Int {
         return mContacts.size
