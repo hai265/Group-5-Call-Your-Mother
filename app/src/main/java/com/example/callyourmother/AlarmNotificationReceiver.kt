@@ -21,7 +21,7 @@ import com.example.callmotherapplicationtest.ContactDetails
 import com.example.callmotherapplicationtest.MainActivity
 import com.example.callmotherapplicationtest.R
 
-class AlarmNotificationReciever: BroadcastReceiver() {
+class AlarmNotificationReceiver: BroadcastReceiver() {
 
     private lateinit var mNotificationManager: NotificationManager
 
@@ -34,21 +34,26 @@ class AlarmNotificationReciever: BroadcastReceiver() {
     private lateinit var mChannelID: String
 
     override fun onReceive(context: Context?, intent: Intent?) {
+
         if (context != null) {
             mContext = context
         }
         val name = intent?.getStringExtra(ContactDetails.NAME)
+        Log.i(MainActivity.TAG, "Notification broadcast recieved from $name" )
         val phoneNumber = intent?.getStringExtra(ContactDetails.PHONENUMBER)
 
         mNotificationManager = mContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         createNotificationChannel()
         //Clicking on notification opens the app (for now)
+        val mCallIntent = Intent(Intent.ACTION_DIAL,Uri.parse("tel:$phoneNumber"))
+
+
         val mNotificationIntent = Intent(mContext, MainActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
         val mContentIntent = PendingIntent.getActivity(
             context, 0,
-            mNotificationIntent, PendingIntent.FLAG_UPDATE_CURRENT
+            mCallIntent, PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         val notificationBuilder = Notification.Builder(
@@ -60,6 +65,9 @@ class AlarmNotificationReciever: BroadcastReceiver() {
             .setContentTitle("Call $name")
             .setContentText("Reminder to call $name, tap to call now.")
             .setContentIntent(mContentIntent)
+
+
+
         mNotificationManager.notify(MainActivity.NOTIFICATION_ID,notificationBuilder.build())
 
     }
@@ -68,8 +76,8 @@ class AlarmNotificationReciever: BroadcastReceiver() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = Resources.getSystem().getString(R.string.channel_name)
-            val descriptionText = Resources.getSystem().getString(R.string.channel_description)
+            val name = mContext.getString(R.string.channel_name)
+            val descriptionText = mContext.getString(R.string.channel_description)
             val importance = NotificationManager.IMPORTANCE_DEFAULT
 
             val channel = NotificationChannel(MainActivity.CHANNEL_ID, name, importance).apply {

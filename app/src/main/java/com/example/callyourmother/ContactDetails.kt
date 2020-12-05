@@ -1,5 +1,6 @@
 package com.example.callmotherapplicationtest
 
+import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Bitmap
 
@@ -15,6 +16,7 @@ class ContactDetails {
     var frequency :Int? = null
     var lastCalled = Date()
     var isLate : Boolean = false
+    var notificationIntent : PendingIntent? = null
 
     internal constructor(name: String, phoneNumber: String, lastCalled: Date, frequency : String){
 
@@ -39,8 +41,12 @@ class ContactDetails {
         } catch (e: ParseException) {
             lastCalled = Date()
         }
-        //TODO - check if this does anything
+
         frequency = intent.getIntExtra(FREQUENCY,1)
+
+    }
+    fun setNotificationPendingIntent(pendingIntent: PendingIntent){
+        notificationIntent = pendingIntent
     }
 
     override fun toString(): String {
@@ -62,10 +68,11 @@ class ContactDetails {
         val PHONENUMBER = "phonenumber"
         val LASTCALLED = "lastCalled"
         val FREQUENCY = "frequency"
+        val INTENT = "intent"
 
 
         val FORMAT = SimpleDateFormat(
-            "yyyy-MM-dd HH:mm:ss", Locale.US)
+            "EEE MMM d HH:mm:ss zzz yyyy", Locale.US)
 
         fun packageToIntent(name : String, phoneNumber: String, lastCalled: Date, frequency: Int) : Intent{
 

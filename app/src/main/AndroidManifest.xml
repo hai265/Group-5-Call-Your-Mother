@@ -3,7 +3,7 @@
     package="com.example.callmotherapplicationtest">
 
 
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <application
         android:allowBackup="true"
@@ -22,7 +22,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ContactSettingsActivity"></activity>
+        <activity android:name=".ContactSettingsActivity" />
+        <receiver android:name="com.example.callyourmother.AlarmNotificationReceiver" />
+
+
     </application>
 
 </manifest>
