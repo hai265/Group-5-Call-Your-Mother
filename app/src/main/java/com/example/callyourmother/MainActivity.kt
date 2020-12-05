@@ -252,6 +252,7 @@ class MainActivity : ListActivity() {
             var phoneNumber: String? = null
             var frequencey: String? = null
             var lastCalled: Date? = null
+            var notificationIntent : PendingIntent? = null
 
             do {
                 name = reader.readLine();
@@ -261,6 +262,7 @@ class MainActivity : ListActivity() {
                 phoneNumber = reader.readLine()
                 frequencey = reader.readLine()
                 lastCalled = ContactDetails.FORMAT.parse(reader.readLine())
+               // notificationIntent = reader.readLine().to
                 mAdapter.add(ContactDetails(name, phoneNumber, lastCalled,frequencey))
 
             }
