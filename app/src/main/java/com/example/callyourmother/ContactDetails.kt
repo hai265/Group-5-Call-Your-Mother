@@ -31,9 +31,11 @@ class ContactDetails {
         cLastCalled.add(Calendar.DATE, this.frequency!!)
         var lateDate = cLastCalled.getTime()
         isLate = currentTime.after(lateDate)
+
     }
 
     internal constructor(intent: Intent){
+
         name = intent.getStringExtra(NAME)
        // image = intent.getParcelableExtra(IMAGE)
         phoneNumber = intent.getStringExtra(PHONENUMBER)
@@ -45,6 +47,13 @@ class ContactDetails {
         }
 
         frequency = intent.getIntExtra(FREQUENCY,1)
+
+        var currentTime = Calendar.getInstance().getTime()
+        var cLastCalled = Calendar.getInstance()
+        cLastCalled.setTime(lastCalled)
+        cLastCalled.add(Calendar.DATE, this.frequency!!)
+        var lateDate = cLastCalled.getTime()
+        isLate = currentTime.after(lateDate)
 
     }
     fun setNotificationPendingIntent(pendingIntent: PendingIntent){
@@ -66,6 +75,10 @@ class ContactDetails {
         return if (unformattedPhoneNumber != null) {
             unformattedPhoneNumber.toLong().toInt()
         } else 0
+    }
+
+    fun remindContact() {
+
     }
 
     companion object{
