@@ -62,7 +62,7 @@ class ContactDetails {
         val FREQUENCY = "frequency"
 
         val FORMAT = SimpleDateFormat(
-            "yyyy-MM-dd HH:mm:ss", Locale.US)
+            "EEE MMM d HH:mm:ss zzz yyyy", Locale.US)
 
         fun packageToIntent(name : String, phoneNumber: String, lastCalled: Date, frequency: Int) : Intent{
 

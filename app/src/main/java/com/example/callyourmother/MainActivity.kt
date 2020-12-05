@@ -85,7 +85,10 @@ class MainActivity : ListActivity() {
 
             val phNumber = cursor.getString(number)
             val callDate = cursor.getString(date)
-            val updateDate =  ContactDetails.FORMAT.parse(callDate)
+
+            val callDayTime = Date(java.lang.Long.valueOf(callDate))
+            Log.d(TAG, "The call date is:"+ callDayTime.toString())
+            val updateDate =  ContactDetails.FORMAT.parse(callDayTime.toString())
 
             //runs through the adapter to see if the phone number matches any in the adapter
             for (idx in 0 until mAdapter.count) {
@@ -94,7 +97,7 @@ class MainActivity : ListActivity() {
 
                 //if matches, and have not already been checked, will update the last call date
                 if(contact.phoneNumber.equals(phNumber) && !numberChecked.contains(phNumber)){
-                    contact.updateLastCalled(updateDate)
+                   contact.updateLastCalled(updateDate)
                     numberChecked.add(phNumber)
                 }
 
