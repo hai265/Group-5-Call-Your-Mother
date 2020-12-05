@@ -100,7 +100,7 @@ class ContactDetails {
 
 
         val FORMAT = SimpleDateFormat(
-            "EEE MMM d HH:mm:ss zzz yyyy", Locale.US)
+            "EEE MMM d", Locale.US)
 
         fun packageToIntent(name : String, phoneNumber: String, lastCalled: Date, frequency: Int) : Intent{
 

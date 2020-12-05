@@ -9,25 +9,31 @@
 
     <TextView
         android:id="@+id/daysLastCall"
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="27dp"
         android:layout_marginTop="16dp"
+        android:paddingRight="15dp"
         android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/contactImage"
+        android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
         app:layout_constraintStart_toEndOf="@+id/callStatus"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="20sp"
+        />
 
     <TextView
         android:id="@+id/callStatus"
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/contactImage"
+        android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
         app:layout_constraintStart_toEndOf="@+id/contactName"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/daysLastCall"
+        android:textSize="20sp"/>
     <!--
         <ImageView
             android:id="@+id/contactImage"
@@ -41,12 +47,13 @@
     -->
     <TextView
         android:id="@+id/contactName"
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/contactImage"
-        app:layout_constraintStart_toEndOf="@+id/contactImage"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="20sp"
+        android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>
