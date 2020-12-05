@@ -71,6 +71,7 @@ class ContactDetails {
 
         isLate = currentTime.after(lateDate)
     }
+
     fun getUniqueID() : Int{
         val unformattedPhoneNumber = phoneNumber?.replace("\\D".toRegex(),"" )
         return if (unformattedPhoneNumber != null) {
