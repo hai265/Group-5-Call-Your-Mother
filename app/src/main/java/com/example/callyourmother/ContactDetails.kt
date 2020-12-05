@@ -32,6 +32,8 @@ class ContactDetails {
         var lateDate = cLastCalled.getTime()
         isLate = currentTime.after(lateDate)
 
+        checkIfLate()
+
     }
 
     internal constructor(intent: Intent){
@@ -48,12 +50,7 @@ class ContactDetails {
 
         frequency = intent.getIntExtra(FREQUENCY,1)
 
-        var currentTime = Calendar.getInstance().getTime()
-        var cLastCalled = Calendar.getInstance()
-        cLastCalled.setTime(lastCalled)
-        cLastCalled.add(Calendar.DATE, this.frequency!!)
-        var lateDate = cLastCalled.getTime()
-        isLate = currentTime.after(lateDate)
+        checkIfLate()
 
     }
     fun setNotificationPendingIntent(pendingIntent: PendingIntent){
@@ -68,8 +65,21 @@ class ContactDetails {
     fun updateLastCalled(update:Date){
 
         lastCalled = update
+        checkIfLate()
     }
 
+
+    //a private function to check if the user is late or not
+    private fun checkIfLate(){
+
+        var currentTime = Calendar.getInstance().getTime()
+        var cLastCalled = Calendar.getInstance()
+        cLastCalled.setTime(lastCalled)
+        cLastCalled.add(Calendar.DATE, this.frequency!!)
+        var lateDate = cLastCalled.getTime()
+
+        isLate = currentTime.after(lateDate)
+    }
     fun getUniqueID() : Int{
         val unformattedPhoneNumber = phoneNumber?.replace("\\D".toRegex(),"" )
         return if (unformattedPhoneNumber != null) {

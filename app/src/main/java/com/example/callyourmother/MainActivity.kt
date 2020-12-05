@@ -47,6 +47,29 @@ class MainActivity : ListActivity() {
         }
         else
            readCallLogs()
+
+
+
+        listView.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+                val contact = mAdapter.getItem(position) as ContactDetails
+                if(contact.name != null && contact.phoneNumber != null && contact.frequency != null && contact.lastCalled != null){
+                    val intent = ContactDetails.packageToIntent(contact.name!!,contact.phoneNumber!!,contact.lastCalled,
+                        contact.frequency!!
+                    )
+                    val startIntent = Intent(this@MainActivity, ContactSettingsActivity::class.java)
+                    lastContactClicked = position
+                    startActivityForResult(startIntent.putExtras(intent), CLICK_CONTACT_REQUEST)
+                }
+            }
+
+        //Load items if necessary
+        if (mAdapter.count == 0) {
+            loadItems()
+            Log.i(TAG, "loaded items")
+        }
+
+        mAlarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
@@ -107,26 +130,6 @@ class MainActivity : ListActivity() {
         }
         cursor.close()
 
-
-        listView.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, view, position, id ->
-                val contact = mAdapter.getItem(position) as ContactDetails
-                if(contact.name != null && contact.phoneNumber != null && contact.frequency != null && contact.lastCalled != null){
-                    val intent = ContactDetails.packageToIntent(contact.name!!,contact.phoneNumber!!,contact.lastCalled,
-                        contact.frequency!!
-                    )
-                    val startIntent = Intent(this@MainActivity, ContactSettingsActivity::class.java)
-                    lastContactClicked = position
-                    startActivityForResult(startIntent.putExtras(intent), CLICK_CONTACT_REQUEST)
-                }
-            }
-
-        //Load items if necessary
-        if (mAdapter.count == 0)
-            loadItems()
-        Log.i(TAG, "loaded items")
-
-        mAlarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
     }
 
     private fun pickContact(){
@@ -200,13 +203,20 @@ class MainActivity : ListActivity() {
             Log.i(TAG, "Contact added")
             mAdapter.add(createdContact)
 
-            // Set repeating alarm 5 seconds
+            // Set repeating alarm 5 seconds FOR DEBUGGING PURPOSES
             mAlarmManager.setRepeating(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                AlarmManager.INTERVAL_DAY * createdContact.frequency!!,
-                AlarmManager.INTERVAL_DAY,
+                5000,
+                5000,
                 mNotificationReceiverPendingIntent
             )
+            // Actual alarm setter
+//            mAlarmManager.setRepeating(
+//                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+//                AlarmManager.INTERVAL_DAY * createdContact.frequency!!,
+//                AlarmManager.INTERVAL_DAY,
+//                mNotificationReceiverPendingIntent
+//            )
             Log.i(TAG,"Alarm for ${returnedIntent.getStringExtra(ContactDetails.NAME)} created")
 
 
@@ -265,7 +275,8 @@ class MainActivity : ListActivity() {
                 val mNotificationReceiverIntent = Intent(
                     this@MainActivity,
                     AlarmNotificationReceiver::class.java
-                )
+                ).putExtra(ContactDetails.NAME,name)
+                    .putExtra(ContactDetails.PHONENUMBER,phoneNumber)
 
                 val mNotificationReceiverPendingIntent =
                     PendingIntent.getBroadcast(
