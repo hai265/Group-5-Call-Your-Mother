@@ -146,6 +146,7 @@ class MainActivity : ListActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        //based on code on stackOverflow
         if (resultCode == RESULT_OK && requestCode == PICK_CONTACT_REQUEST){
             if (data != null) {
                 var cursor: Cursor? = null
@@ -186,9 +187,6 @@ class MainActivity : ListActivity() {
 
         //Pressed "submit" on the contact settings page
         else if (resultCode == RESULT_OK && requestCode == ADD_CONTACT_REQUEST){
-
-
-
             val returnedIntent = Intent(data)
                 //.putExtra(ContactDetails.INTENT,mNotificationReceiverPendingIntent)
 
@@ -209,30 +207,35 @@ class MainActivity : ListActivity() {
             Log.i(TAG, "Contact added")
             mAdapter.add(createdContact)
 
-            // Set repeating alarm 5 seconds FOR DEBUGGING PURPOSES
-            mAlarmManager.setRepeating(
-                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                5000,
-                5000,
-                mNotificationReceiverPendingIntent
-            )
-
-            // Actual alarm setter
+//            // Set repeating alarm 5 seconds FOR DEBUGGING PURPOSES
 //            mAlarmManager.setRepeating(
 //                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-//                AlarmManager.INTERVAL_DAY * createdContact.frequency!!,
-//                AlarmManager.INTERVAL_DAY,
+//                5000,
+//                5000,
 //                mNotificationReceiverPendingIntent
 //            )
 
-
+      //       Actual alarm setter
+            mAlarmManager.setRepeating(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                AlarmManager.INTERVAL_DAY * createdContact.frequency!!,
+                AlarmManager.INTERVAL_DAY,
+                mNotificationReceiverPendingIntent
+            )
             Log.i(TAG,"Alarm for ${returnedIntent.getStringExtra(ContactDetails.NAME)} created")
 
 
         }
+            //Pressed "save" on a clicked contact to edit the contact
+            else if (requestCode == CLICK_CONTACT_REQUEST && resultCode == RESULT_OK){
+            if (data != null) {
+                mAdapter.editContact(lastContactClicked,data.getIntExtra(ContactDetails.FREQUENCY,1))
+                mAdapter.notifyDataSetChanged()
+            }
+        }
 
         //Pressed "delete" on the contact settings page. Deletes the contact from the list and also cancels the alarm
-        if(resultCode == DELETE) {
+        else if(resultCode == DELETE && requestCode == CLICK_CONTACT_REQUEST) {
             val contact = mAdapter.getItem(lastContactClicked)
             if(contact.notificationIntent != null) {
                 mAlarmManager.cancel(contact.notificationIntent)
