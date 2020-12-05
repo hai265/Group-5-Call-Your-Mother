@@ -30,6 +30,7 @@ class ContactDetails {
         cLastCalled.setTime(lastCalled)
         cLastCalled.add(Calendar.DATE, this.frequency!!)
         var lateDate = cLastCalled.getTime()
+
         isLate = currentTime.after(lateDate)
     }
 
