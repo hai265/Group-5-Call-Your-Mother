@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.callyourmother.AlarmNotificationReceiver
 import java.text.SimpleDateFormat
@@ -23,9 +24,15 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
     val TAG = "Group-5-Call-Your-Mother"
 
 
-    fun add (contact: ContactDetails){
-        mContacts.add(contact)
-        notifyDataSetChanged()
+    fun add (contact: ContactDetails) : Boolean{
+        if(!mContacts.contains(contact)) {
+            mContacts.add(contact)
+            notifyDataSetChanged()
+            return true
+        }
+        Toast.makeText(mContext,"Cannot add duplicate contacts",Toast.LENGTH_SHORT).show()
+        return false
+
 
         //Create intent to broadcast to AlarmNotificationReciever
 
@@ -36,6 +43,10 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
         mContacts.removeAt(position)
 
         notifyDataSetChanged()
+    }
+
+    fun editContact(position : Int, frequency : Int){
+        mContacts[position].frequency = frequency
     }
 
 

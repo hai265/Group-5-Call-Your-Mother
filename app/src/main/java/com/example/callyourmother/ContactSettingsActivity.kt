@@ -19,13 +19,13 @@ class ContactSettingsActivity : Activity() {
    // private var mSaveButton: Button? = null
     private var mFrequencyText: TextView? = null
     private var mPhoneNumberText: TextView? = null
-    private var mTimeText: TextView? = null
-    private var mEditTextPhoneNumber: EditText? = null
-    private var mEditTextFrequency: EditText? = null
-    private var mEditTextTime: EditText? = null
-    private var mEditTextPersonName: EditText? = null
 
-    private var mContactPosition : Int? = null
+    private var mEditTextPhoneNumber: TextView? = null
+    private var mEditTextFrequency: EditText? = null
+
+    private var mEditTextPersonName: TextView? = null
+
+
 
 
 
@@ -44,18 +44,19 @@ class ContactSettingsActivity : Activity() {
         //mSaveButton = findViewById<View>(R.id.saveButton) as Button
         mFrequencyText = findViewById<View>(R.id.frequencyText) as TextView
         mPhoneNumberText = findViewById<View>(R.id.phoneNumberText) as TextView
-        mTimeText = findViewById<View>(R.id.timeText) as TextView
-        mEditTextPhoneNumber = findViewById<View>(R.id.editTextPhoneNumber) as EditText
+
+        mEditTextPhoneNumber = findViewById<View>(R.id.editTextPhoneNumber) as TextView
         mEditTextFrequency = findViewById<View>(R.id.editTextFrequency) as EditText
-        mEditTextTime = findViewById<View>(R.id.editTextTime) as EditText
-        mEditTextPersonName = findViewById<View>(R.id.editTextTextPersonName) as EditText
+
+        mEditTextPersonName = findViewById<View>(R.id.editTextTextPersonName) as TextView
 
 
 
         mEditTextPhoneNumber!!.setText(intent.getStringExtra(ContactDetails.PHONENUMBER).toString())
         mEditTextPersonName!!.setText(intent.getStringExtra(ContactDetails.NAME).toString())
-        mEditTextTime!!.setText(Date().toString())
-        mEditTextTime!!
+
+
+        mEditTextFrequency!!.setText(intent.getIntExtra(ContactDetails.FREQUENCY,1).toString())
 
 
 
