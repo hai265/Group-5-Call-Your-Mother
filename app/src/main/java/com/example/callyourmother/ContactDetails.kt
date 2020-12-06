@@ -68,9 +68,6 @@ class ContactDetails {
         checkIfLate()
     }
 
-    //a private function to check if the user is late or not
-
-
     fun getUniqueID() : Int{
         val unformattedPhoneNumber = phoneNumber?.replace("\\D".toRegex(),"" )
         return if (unformattedPhoneNumber != null) {
