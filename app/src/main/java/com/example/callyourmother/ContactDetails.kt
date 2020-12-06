@@ -53,6 +53,12 @@ class ContactDetails {
                 + FORMAT.format(lastCalled))
     }
 
+    override fun equals(other: Any?): Boolean {
+        if(other is ContactDetails)
+            return name.equals(other.name) && phoneNumber.equals(other.phoneNumber)
+        return false
+    }
+
     fun updateLastCalled(update:Date){
 
         lastCalled = update
