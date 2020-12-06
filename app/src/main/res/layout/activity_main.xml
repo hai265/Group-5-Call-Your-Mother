@@ -28,6 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:paddingRight="57dp"
+        android:paddingBottom="20dp"
         android:text="Name:"
         android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
         android:textSize="25sp"
@@ -55,12 +56,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Date:"
+        android:text="Last Called Date:"
         android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
-        android:textSize="25sp"
+        android:textSize="21sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/number"
         app:layout_constraintTop_toBottomOf="@id/title"
+
 
         />
 

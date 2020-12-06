@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.provider.CallLog
+import android.telephony.PhoneNumberUtils
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -81,15 +82,13 @@ class ContactSettingsActivity : Activity() {
 
             while (cursor.moveToNext()) {
 
-                val phNumber = cursor.getString(number)
+                val phNumber = PhoneNumberUtils.formatNumber(cursor.getString(number),Locale.getDefault().getCountry())
                 val callDate = cursor.getString(date)
                 val callDayTime = Date(java.lang.Long.valueOf(callDate))
                 val updateDate =  ContactDetails.FORMAT.parse(callDayTime.toString())
 
-
                 if(phoneNumber.equals(phNumber)){
                     lastCalled = updateDate
-                    break
                 }
             }
             cursor.close()

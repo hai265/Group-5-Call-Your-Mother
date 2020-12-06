@@ -3,6 +3,7 @@ package com.example.callmotherapplicationtest
 import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Bitmap
+import android.util.Log
 
 import java.sql.Time
 import java.text.ParseException
@@ -57,12 +58,9 @@ class ContactDetails {
 
         lastCalled = update
 
-
         checkIfLate()
     }
 
-    //a private function to check if the user is late or not
-   
 
     fun getUniqueID() : Int{
         val unformattedPhoneNumber = phoneNumber?.replace("\\D".toRegex(),"" )
@@ -74,6 +72,7 @@ class ContactDetails {
     //a private function to check if the user is late or not
     private fun checkIfLate(){
 
+
         var currentTime = Calendar.getInstance().getTime()
         var cLastCalled = Calendar.getInstance()
         cLastCalled.setTime(lastCalled)
@@ -81,6 +80,7 @@ class ContactDetails {
         var lateDate = cLastCalled.getTime()
 
         isLate = currentTime.after(lateDate)
+
     }
 
 
@@ -97,10 +97,10 @@ class ContactDetails {
         val LASTCALLED = "lastCalled"
         val FREQUENCY = "frequency"
         val INTENT = "intent"
-
+        val TAG = "Group-5-Call-Your-Mother"
 
         val FORMAT = SimpleDateFormat(
-            "EEE MMM d", Locale.US)
+            "EEE MMM d HH:mm:ss zzz yyyy", Locale.US)
 
         fun packageToIntent(name : String, phoneNumber: String, lastCalled: Date, frequency: Int) : Intent{
 

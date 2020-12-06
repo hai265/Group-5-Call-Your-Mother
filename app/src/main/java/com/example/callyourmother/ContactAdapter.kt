@@ -3,6 +3,7 @@ package com.example.callmotherapplicationtest
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,12 +11,16 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.callyourmother.AlarmNotificationReceiver
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ContactAdapter(private val mContext : Context) : BaseAdapter() {
 
     private val mContacts = ArrayList<ContactDetails>()
     private val mAlarmIntents = ArrayList<PendingIntent>()
     private var inflater: LayoutInflater = LayoutInflater.from(mContext)
+    val TAG = "Group-5-Call-Your-Mother"
 
 
     fun add (contact: ContactDetails){
@@ -70,8 +75,11 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
         else
             viewHolder = convertView.tag as ViewHolder
 
+        var cLastCalled = ContactDetails.FORMAT.format(current.lastCalled)
+
+
         viewHolder.nameView?.text = current.name
-        viewHolder.daysView?.text = ContactDetails.FORMAT.format(current.lastCalled)
+        viewHolder.daysView?.text = cLastCalled.substring(0,10)
 
         if(current.isLate)
             viewHolder.statusView?.text ="Call Now"
