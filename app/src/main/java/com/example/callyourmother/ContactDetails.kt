@@ -63,11 +63,14 @@ class ContactDetails {
     fun updateLastCalled(update:Date){
 
         lastCalled = update
-
-
         checkIfLate()
     }
 
+    fun updateFrequency(update:Int){
+
+        frequency = update
+        checkIfLate()
+    }
     fun getUniqueID() : Int{
         val unformattedPhoneNumber = phoneNumber?.replace("\\D".toRegex(),"" )
         return if (unformattedPhoneNumber != null) {

@@ -19,7 +19,6 @@ import kotlin.collections.ArrayList
 class ContactAdapter(private val mContext : Context) : BaseAdapter() {
 
     private val mContacts = ArrayList<ContactDetails>()
-    private val mAlarmIntents = ArrayList<PendingIntent>()
     private var inflater: LayoutInflater = LayoutInflater.from(mContext)
     val TAG = "Group-5-Call-Your-Mother"
 
@@ -33,10 +32,6 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
         Toast.makeText(mContext,"Cannot add duplicate contacts",Toast.LENGTH_SHORT).show()
         return false
 
-
-        //Create intent to broadcast to AlarmNotificationReciever
-
-
     }
 
     fun remove (position : Int){
@@ -46,7 +41,7 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
     }
 
     fun editContact(position : Int, frequency : Int){
-        mContacts[position].frequency = frequency
+        mContacts[position].updateFrequency(frequency)
     }
 
 
@@ -76,7 +71,6 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
             newView = inflater.inflate(R.layout.contact_item,parent,false)
             viewHolder.mContactLayout = newView.findViewById(R.id.contactItemLayout)
             viewHolder.nameView = newView.findViewById(R.id.contactName)
-            //viewHolder.imageView = newView.findViewById(R.id.contactImage)
             viewHolder.daysView = newView.findViewById(R.id.daysLastCall)
             viewHolder.statusView = newView.findViewById(R.id.callStatus)
             viewHolder.position = position
@@ -104,7 +98,6 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
     internal class ViewHolder{
         var position: Int = 0
         var mContactLayout: ConstraintLayout? = null
-    //    var imageView : ImageView? = null
         var nameView : TextView? = null
         var statusView : TextView? = null
         var daysView: TextView? = null
