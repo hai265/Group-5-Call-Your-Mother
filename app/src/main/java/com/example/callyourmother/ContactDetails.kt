@@ -12,7 +12,6 @@ import java.util.*
 
 class ContactDetails {
     var name : String? = null
-   // var image: Bitmap? = null
     var phoneNumber : String? = null
     var frequency :Int? = null
     var lastCalled = Date()
@@ -31,7 +30,6 @@ class ContactDetails {
 
     internal constructor(intent: Intent){
         name = intent.getStringExtra(NAME)
-       // image = intent.getParcelableExtra(IMAGE)
         phoneNumber = intent.getStringExtra(PHONENUMBER)
         //pass in the time as a toString first
         try {
@@ -90,21 +88,13 @@ class ContactDetails {
         isLate = currentTime.after(lateDate)
     }
 
-
-    fun remindContact() {
-
-    }
-
     companion object{
 
         val ITEM_SEP = System.getProperty("line.separator")
         val NAME = "name"
-      //  val IMAGE = "image"
         val PHONENUMBER = "phonenumber"
         val LASTCALLED = "lastCalled"
         val FREQUENCY = "frequency"
-        val INTENT = "intent"
-        val TAG = "Group-5-Call-Your-Mother"
 
         val FORMAT = SimpleDateFormat(
             "EEE MMM d HH:mm:ss zzz yyyy", Locale.US)
@@ -113,7 +103,6 @@ class ContactDetails {
 
             val intent = Intent()
             intent.putExtra(NAME,name)
-            //intent.putExtra(IMAGE,image)
             intent.putExtra(PHONENUMBER,phoneNumber)
             intent.putExtra(LASTCALLED,lastCalled.toString())
             intent.putExtra(FREQUENCY,frequency)

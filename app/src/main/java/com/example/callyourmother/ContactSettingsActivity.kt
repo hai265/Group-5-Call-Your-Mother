@@ -14,21 +14,11 @@ import java.util.*
 
 class ContactSettingsActivity : Activity() {
 
-    //private var mDeleteButton: Button? = null
-    //private var mCancelButton: Button? = null
-   // private var mSaveButton: Button? = null
     private var mFrequencyText: TextView? = null
     private var mPhoneNumberText: TextView? = null
-
     private var mEditTextPhoneNumber: TextView? = null
     private var mEditTextFrequency: EditText? = null
-
     private var mEditTextPersonName: TextView? = null
-
-
-
-
-
 
 
     override fun onCreate(savedInstanceState : Bundle?) {
@@ -37,28 +27,14 @@ class ContactSettingsActivity : Activity() {
 
         setContentView(R.layout.contact_settings)
 
-
-
-        //mDeleteButton = findViewById<View>(R.id.deleteButton) as Button
-        //mCancelButton = findViewById<View>(R.id.cancelButton) as Button
-        //mSaveButton = findViewById<View>(R.id.saveButton) as Button
         mFrequencyText = findViewById<View>(R.id.frequencyText) as TextView
         mPhoneNumberText = findViewById<View>(R.id.phoneNumberText) as TextView
-
         mEditTextPhoneNumber = findViewById<View>(R.id.editTextPhoneNumber) as TextView
         mEditTextFrequency = findViewById<View>(R.id.editTextFrequency) as EditText
-
         mEditTextPersonName = findViewById<View>(R.id.editTextTextPersonName) as TextView
-
-
-
         mEditTextPhoneNumber!!.setText(intent.getStringExtra(ContactDetails.PHONENUMBER).toString())
         mEditTextPersonName!!.setText(intent.getStringExtra(ContactDetails.NAME).toString())
-
-
         mEditTextFrequency!!.setText(intent.getIntExtra(ContactDetails.FREQUENCY,1).toString())
-
-
 
         val cancelButton = findViewById<View>(R.id.cancelButton) as Button
         cancelButton.setOnClickListener{
@@ -74,6 +50,8 @@ class ContactSettingsActivity : Activity() {
             val phoneNumber = mEditTextPhoneNumber!!.text.toString()
             var lastCalled = Calendar.getInstance().getTime()
 
+            //Based on a code snippet on StackOverFlow
+            // https://stackoverflow.com/questions/6786666/how-do-i-access-call-log-for-android
             val cursor = getContentResolver().query(
                 CallLog.Calls.CONTENT_URI, null,
                 null, null, null)
@@ -81,6 +59,7 @@ class ContactSettingsActivity : Activity() {
             val number = cursor!!.getColumnIndex(CallLog.Calls.NUMBER)
             val date = cursor!!.getColumnIndex(CallLog.Calls.DATE)
 
+            //moves through the phone log
             while (cursor.moveToNext()) {
 
                 val phNumber = PhoneNumberUtils.formatNumber(cursor.getString(number),Locale.getDefault().getCountry())
@@ -93,7 +72,6 @@ class ContactSettingsActivity : Activity() {
                 }
             }
             cursor.close()
-
 
             var returnIntent = ContactDetails.packageToIntent(name,phoneNumber, lastCalled,
                 mEditTextFrequency!!.text.toString().toInt())

@@ -20,8 +20,6 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
 
     private val mContacts = ArrayList<ContactDetails>()
     private var inflater: LayoutInflater = LayoutInflater.from(mContext)
-    val TAG = "Group-5-Call-Your-Mother"
-
 
     fun add (contact: ContactDetails) : Boolean{
         if(!mContacts.contains(contact)) {

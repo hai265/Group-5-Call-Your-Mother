@@ -96,7 +96,8 @@ class MainActivity : ListActivity() {
         }
     }
 
-    //Based on StackOverFlow
+    //Based on a code snippet on StackOverFlow
+    // https://stackoverflow.com/questions/6786666/how-do-i-access-call-log-for-android
     private fun readCallLogs(){
 
         Log.i(TAG, "Enter readCallLog")
@@ -260,8 +261,6 @@ class MainActivity : ListActivity() {
 
     override fun onPause() {
         super.onPause()
-
-        // Save ToDoItems
 
         saveItems()
         Log.i(TAG, "saved items")

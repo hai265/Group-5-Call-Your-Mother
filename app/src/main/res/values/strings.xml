@@ -14,7 +14,7 @@
     <string name="deleteButton">Delete</string>
     <string name="cancelButton">Cancel</string>
     <string name="saveButton">Save</string>
-    <string name="frequencyText">Reminder Frequency</string>
+    <string name="frequencyText">Reminder Frequency \n(in days)</string>
     <string name="phoneNumberText">Phone Number</string>
     <string name="timeTextView">Time to be reminded</string>
     <string name="nameText">Contact Name</string>
