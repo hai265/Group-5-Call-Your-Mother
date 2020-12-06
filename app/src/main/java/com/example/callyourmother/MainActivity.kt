@@ -210,20 +210,20 @@ class MainActivity : ListActivity() {
             if(mAdapter.add(createdContact)) {
 
             // Set repeating alarm 5 seconds FOR DEBUGGING PURPOSES
-            mAlarmManager.setRepeating(
-                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                5000,
-                5000,
-                mNotificationReceiverPendingIntent
-            )
+//            mAlarmManager.setRepeating(
+//                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+//                5000,
+//                5000,
+//                mNotificationReceiverPendingIntent
+//            )
 
-//                //       Actual alarm setter
-//                mAlarmManager.setRepeating(
-//                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
-//                    AlarmManager.INTERVAL_DAY * createdContact.frequency!!,
-//                    AlarmManager.INTERVAL_DAY,
-//                    mNotificationReceiverPendingIntent
-//                )
+                //       Actual alarm setter
+                mAlarmManager.setRepeating(
+                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    AlarmManager.INTERVAL_DAY * createdContact.frequency!!,
+                    AlarmManager.INTERVAL_DAY,
+                    mNotificationReceiverPendingIntent
+                )
                 Log.i(
                     TAG,
                     "Alarm for ${returnedIntent.getStringExtra(ContactDetails.NAME)} created"
