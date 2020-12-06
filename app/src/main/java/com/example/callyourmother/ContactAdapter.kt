@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.callyourmother.AlarmNotificationReceiver
 
@@ -19,15 +18,9 @@ class ContactAdapter(private val mContext : Context) : BaseAdapter() {
     private var inflater: LayoutInflater = LayoutInflater.from(mContext)
 
 
-    fun add (contact: ContactDetails) : Boolean{
-        if(!mContacts.contains(contact)) {
-            mContacts.add(contact)
-            notifyDataSetChanged()
-            return true
-        }
-        Toast.makeText(mContext,"Cannot add duplicate contacts",Toast.LENGTH_SHORT).show()
-        return false
-
+    fun add (contact: ContactDetails){
+        mContacts.add(contact)
+        notifyDataSetChanged()
 
         //Create intent to broadcast to AlarmNotificationReciever
 

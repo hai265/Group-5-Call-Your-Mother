@@ -15,7 +15,6 @@ import android.provider.ContactsContract
 import android.telephony.PhoneNumberUtils
 import android.util.Log
 import android.widget.AdapterView
-import android.widget.Toast
 import com.example.callyourmother.AlarmNotificationReceiver
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.*
@@ -206,7 +205,7 @@ class MainActivity : ListActivity() {
 
             mAdapter.notifyDataSetChanged()
             Log.i(TAG, "Contact added")
-            if(mAdapter.add(createdContact)) {
+            mAdapter.add(createdContact)
 
 //            // Set repeating alarm 5 seconds FOR DEBUGGING PURPOSES
 //            mAlarmManager.setRepeating(
@@ -216,19 +215,15 @@ class MainActivity : ListActivity() {
 //                mNotificationReceiverPendingIntent
 //            )
 
-                //       Actual alarm setter
-                mAlarmManager.setRepeating(
-                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    AlarmManager.INTERVAL_DAY * createdContact.frequency!!,
-                    AlarmManager.INTERVAL_DAY,
-                    mNotificationReceiverPendingIntent
-                )
-                Log.i(
-                    TAG,
-                    "Alarm for ${returnedIntent.getStringExtra(ContactDetails.NAME)} created"
-                )
-                Toast.makeText(applicationContext,"Contact and reminder successfully added",Toast.LENGTH_SHORT).show()
-            }
+      //       Actual alarm setter
+            mAlarmManager.setRepeating(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                AlarmManager.INTERVAL_DAY * createdContact.frequency!!,
+                AlarmManager.INTERVAL_DAY,
+                mNotificationReceiverPendingIntent
+            )
+            Log.i(TAG,"Alarm for ${returnedIntent.getStringExtra(ContactDetails.NAME)} created")
+
 
         }
             //Pressed "save" on a clicked contact to edit the contact
@@ -246,7 +241,6 @@ class MainActivity : ListActivity() {
                 mAlarmManager.cancel(contact.notificationIntent)
             }
             deleteContact(lastContactClicked)
-            Toast.makeText(applicationContext,"Contact and reminder successfully deleted",Toast.LENGTH_SHORT).show()
         }
     }
     //TODO - Remove alarm when deleting the contact
