@@ -149,6 +149,7 @@ class MainActivity : ListActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         //based on code on stackOverflow
+        //https://stackoverflow.com/questions/32954413/android-contact-picker-get-name-number-email
         if (resultCode == RESULT_OK && requestCode == PICK_CONTACT_REQUEST){
             if (data != null) {
                 var cursor: Cursor? = null
